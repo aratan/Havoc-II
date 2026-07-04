@@ -20,7 +20,7 @@ Havoc works well on Debian 10/11, Ubuntu 20.04/22.04 and Kali Linux. It's recomm
 See the [Installation](https://havocframework.com/docs/installation) docs for instructions. If you run into issues, check the [Known Issues](https://github.com/HavocFramework/Havoc/wiki#known-issues) page as well as the open/closed [Issues](https://github.com/HavocFramework/Havoc/issues) list.
 
 ---
-
+folk de https://github.com/HavocFramework/Havoc/fork
 ### Features
 
 #### Client

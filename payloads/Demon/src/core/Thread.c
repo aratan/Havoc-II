@@ -36,7 +36,7 @@ BOOL ThreadQueryTib(
     ThdCtx.ContextFlags = CONTEXT_FULL;
 
     /* iterate over current process threads */
-    while ( NT_SUCCESS( SysNtGetNextThread( NtCurrentProcess(), ThdHndl, THREAD_ALL_ACCESS, 0, 0, &ThdNext ) ) )
+    while ( NT_SUCCESS( SysNtGetNextThread( NtCurrentProcess(), ThdHndl, THREAD_QUERY_INFORMATION | THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT, 0, 0, &ThdNext ) ) )
     {
         /* if the thread handle is valid close it */
         if ( ThdHndl ) {
@@ -268,7 +268,19 @@ HANDLE ThreadCreate(
         }
 
         case THREAD_METHOD_NTQUEUEAPCTHREAD: {
-            /* TODO: finish implementing it */
+            HANDLE hTargetThread = NULL;
+
+            // Enumerate threads in the target process and queue APC
+            // to the first available thread. It will execute Entry(Arg)
+            // when the thread enters an alertable state.
+            if (NT_SUCCESS(SysNtGetNextThread(Process, NULL, THREAD_SET_CONTEXT, 0, 0, &hTargetThread))) {
+                if (!NT_SUCCESS(SysNtQueueApcThread(hTargetThread, (PPS_APC_ROUTINE)Entry, Arg, NULL, NULL))) {
+                    SysNtClose(hTargetThread);
+                    hTargetThread = NULL;
+                }
+            }
+
+            Thread = hTargetThread;
             break;
         }
 

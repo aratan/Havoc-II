@@ -784,7 +784,6 @@ VOID DemonConfig()
 #endif
 
     Instance->Config.Implant.ThreadStartAddr = Instance->Win32.LdrLoadDll + 0x12; /* TODO: default -> change that or make it optional via builder or profile */
-    Instance->Config.Inject.Technique        = INJECTION_TECHNIQUE_SYSCALL;
 
     ParserDestroy( &Parser );
 }
