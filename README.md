@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="125px" src="assets/Havoc.png" />
+  <img width="125px" src="assets/Havoc-II.png" />
   <h1>Havoc-II</h1>
   <br/>
 
