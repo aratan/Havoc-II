@@ -117,13 +117,48 @@ flowchart TB
     Core --> NW
 ```
 
-### Quick Start
+## Compatibilidad
 
-> Please see the [Wiki](https://github.com/HavocFramework/Havoc/wiki) for complete documentation.
+> ✅ **Havoc-II compila sin errores en entornos modernos.** No requiere toolchains legacy ni workarounds.
 
-Havoc works well on Debian 10/11, Ubuntu 20.04/22.04 and Kali Linux. It's recommended to use the latest versions possible to avoid issues. You'll need a modern version of Qt and Python 3.10.x to avoid build issues.
+| Componente | Toolchain | Versión probada |
+|---|---|---|
+| Teamserver | Go | 1.22+ |
+| Demon payload | MinGW-w64 (GCC 14+) via CMake + NASM | 16.1.0 |
+| Demon payload (producción) | Go Builder + MinGW-w64 + NASM | 16.1.0 |
+| SO (build host) | Arch Linux / CachyOS (rolling) | — |
+| SO (target) | Windows 10/11 x64 | — |
 
-See the [Installation](https://havocframework.com/docs/installation) docs for instructions. If you run into issues, check the [Known Issues](https://github.com/HavocFramework/Havoc/wiki#known-issues) page as well as the open/closed [Issues](https://github.com/HavocFramework/Havoc/issues) list.
+### Build rápido del teamserver
+
+```bash
+# Dependencias — Arch Linux / CachyOS
+sudo pacman -S go mingw-w64-gcc nasm
+
+# Clonar y compilar
+git clone https://github.com/aratan/Havoc-II.git
+cd Havoc-II
+make
+
+# El binario se genera en Teamserver/teamserver
+```
+
+### Build del Demon payload vía CMake (dev)
+
+```bash
+cd payloads/Demon
+mkdir -p build && cd build
+cmake ..
+make -j$(nproc)
+
+# Genera: Demon.exe, DemonSvc.exe, DemonDll.dll
+```
+
+### Build vía Go Builder (producción)
+
+El teamserver ya incluye el pipeline de compilación. Al generar un payload desde la interfaz, se usa `builder.go` con MinGW-w64 16+ y NASM — sin necesidad de tocar CMake.
+
+> Para la documentación completa del framework original, ver la [Wiki](https://github.com/HavocFramework/Havoc/wiki) y la [guía de instalación](https://havocframework.com/docs/installation).
 
 ---
 
