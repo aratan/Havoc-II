@@ -1,3 +1,13 @@
+/*
+ * Modified: 2026-07-04
+ * Author: aratan (https://github.com/aratan)
+ * Changes:
+ *   - ThreadQueryTib: THREAD_ALL_ACCESS → minimal required rights
+ *     (THREAD_QUERY_INFORMATION | THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT).
+ *   - THREAD_METHOD_NTQUEUEAPCTHREAD: implemented APC stub using
+ *     SysNtGetNextThread + SysNtQueueApcThread.
+ */
+
 #include <Demon.h>
 #include <common/Macros.h>
 #include <core/Thread.h>

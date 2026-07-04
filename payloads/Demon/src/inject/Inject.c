@@ -1,3 +1,11 @@
+/*
+ * Modified: 2026-07-04
+ * Author: aratan (https://github.com/aratan)
+ * Change: DllInjectReflective now uses ctx->Technique instead of
+ *         hardcoded THREAD_METHOD_NTCREATEHREADEX. The technique value
+ *         is set by the caller from Optional["Technique"].
+ */
+
 #include <Demon.h>
 #include <ntstatus.h>
 

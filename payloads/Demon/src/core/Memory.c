@@ -1,3 +1,13 @@
+/*
+ * Modified: 2026-07-04
+ * Author: aratan (https://github.com/aratan)
+ * Changes:
+ *   - Removed orphaned PackageCreate at lines 72-75 that allocated
+ *     but never transmitted (memory leak).
+ *   - MmVirtualFree: MEM_MAPPED now uses the correct Process handle
+ *     instead of NtCurrentProcess() for SysNtUnmapViewOfSection.
+ */
+
 #include <Demon.h>
 #include <core/Memory.h>
 #include <core/MiniStd.h>

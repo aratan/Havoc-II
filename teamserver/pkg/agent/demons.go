@@ -1,3 +1,14 @@
+/*
+ * Modified: 2026-07-04
+ * Author: aratan (https://github.com/aratan)
+ * Change: In TaskPrepare for COMMAND_DLL_LOAD:
+ *   - Replaced zero-valued InjectMethode with proper Technique parsing
+ *     from Optional["Technique"], mapped to THREAD_METHOD_* constants
+ *     matching the C-side enum (DEFAULT/CREATEREMOTETHREAD/NTCREATEHREADEX/
+ *     NTQUEUEAPCTHREAD). This completes the injection technique selection
+ *     chain: Go Optional["Technique"] → C InjCtx.Technique → ThreadCreate.
+ */
+
 package agent
 
 import (

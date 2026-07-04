@@ -1,3 +1,16 @@
+#
+# Modified: 2026-07-04
+# Author: aratan (https://github.com/aratan)
+# Changes:
+#   - Restructured into 3 targets (Demon.exe, DemonSvc.exe, DemonDll.dll)
+#     with per-target entry-point flags.
+#   - Added NASM ASM_NASM support for Syscall.x64.asm + Spoof.x64.asm.
+#   - Removed -lmscoree -lmscorlib (not available as static libs;
+#     mscoree.dll loaded at runtime).
+#   - Removed global -Wl,-e,main (breaks DLL builds).
+#   - Added -Wno-incompatible-pointer-types -fpermissive for MinGW 16.1.0.
+#
+
 cmake_minimum_required(VERSION 3.19)
 project( Demon C )
 

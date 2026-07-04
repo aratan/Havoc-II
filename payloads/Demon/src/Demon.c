@@ -1,3 +1,11 @@
+/*
+ * Modified: 2026-07-04
+ * Author: aratan (https://github.com/aratan)
+ * Change: Removed dead Config.Inject.Technique hardcode at line 787.
+ *         This field was write-only — the real technique flows through
+ *         InjCtx.Technique per-command from Go's Optional["Technique"].
+ */
+
 #include <Demon.h>
 
 /* Import Common Headers */

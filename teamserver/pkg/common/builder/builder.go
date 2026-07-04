@@ -1,3 +1,12 @@
+/*
+ * Modified: 2026-07-04
+ * Author: aratan (https://github.com/aratan)
+ * Change: Added -Wno-incompatible-pointer-types -fpermissive to both
+ *         debug and release CFlags for MinGW 16.1.0 compatibility.
+ *         Fixes ~20 __stosb type errors and NULL→integer conversions
+ *         from stricter pointer type checking in GCC 14+.
+ */
+
 package builder
 
 import (
