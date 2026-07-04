@@ -4,7 +4,7 @@
   <br/>
 
   <p><i>Havoc is a modern and malleable post-exploitation command and control framework, originally created by <a href="https://twitter.com/C5pider">@C5pider</a>.</i></p>
-  <p><b>Havoc-II</b> is a <a href="https://github.com/aratan/Havoc-II">maintained fork</a> focused on Demon payload stability, modern toolchain compatibility, and bug fixes while preserving the original architecture and malleability philosophy.</p>
+  <p><b>Havoc-II</b> is a <a href="https://github.com/aratan/Havoc-II">maintained fork created by @Aratan.</a> focused on Demon payload stability, modern toolchain compatibility, and bug fixes while preserving the original architecture and malleability philosophy.</p>
   <br />
 
   <img src="assets/Screenshots/FullSessionGraph.jpeg" width="90%" /><br />
