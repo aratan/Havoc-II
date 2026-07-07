@@ -231,6 +231,35 @@ PVOID KGetProcAddressByHash( PINSTANCE Instance, PVOID DllModuleBase, DWORD Func
     AddressOfFunctions      = RVA2VA( PVOID, DllModuleBase, ModuleExportedDirectory->AddressOfFunctions );
     AddressOfNameOrdinals   = RVA2VA( PVOID, DllModuleBase, ModuleExportedDirectory->AddressOfNameOrdinals );
 
+    /* Ordinal-based lookup: FunctionHash == 0 signals ordinal resolution */
+    if ( FunctionHash == 0 && Ordinal != 0 )
+    {
+        WORD OrdinalIndex = Ordinal - ModuleExportedDirectory->Base;
+        if ( OrdinalIndex < ModuleExportedDirectory->NumberOfFunctions )
+        {
+            FunctionAddr = RVA2VA( PVOID, DllModuleBase, AddressOfFunctions[ OrdinalIndex ] );
+
+            /* Handle forwarded exports (e.g. "NTDLL.RtlExitUserProcess") */
+            if ( ( ULONG_PTR ) FunctionAddr >= ( ULONG_PTR ) ModuleExportedDirectory &&
+                 ( ULONG_PTR ) FunctionAddr <  RVA2VA( ULONG_PTR, ModuleExportedDirectory, ExportedDirectorySize ) )
+            {
+                CHAR    Library [ MAX_PATH ] = { 0 };
+                CHAR    Function[ MAX_PATH ] = { 0 };
+
+                Index = CopyDotStr( FunctionAddr );
+                Memcpy( Library,  FunctionAddr, Index );
+                Memcpy( Function, RVA2VA( PVOID, FunctionAddr, Index + 1 ), KStringLengthA( RVA2VA( PCHAR, FunctionAddr, Index + 1 ) ) );
+
+                DllModuleBase = KLoadLibrary( Instance, Library );
+                FunctionAddr  = KGetProcAddressByHash( Instance, DllModuleBase, KHashString( Function, 0 ), 0 );
+            }
+
+            return FunctionAddr;
+        }
+
+        return NULL;
+    }
+
     for ( DWORD i = 0; i < ModuleExportedDirectory->NumberOfNames; i++ )
     {
         if ( KHashString( RVA2VA( PCHAR, DllModuleBase, AddressOfNames[ i ] ), 0 ) == FunctionHash )
@@ -285,8 +314,7 @@ VOID KResolveIAT( PINSTANCE Instance, LPVOID KaynImage, LPVOID IatDir )
         {
             if ( IMAGE_SNAP_BY_ORDINAL( OriginalTD->u1.Ordinal ) )
             {
-                // TODO: get function by ordinal
-                PVOID Function = KGetProcAddressByHash( Instance, ImportModule, NULL, IMAGE_ORDINAL( OriginalTD->u1.Ordinal ) );
+                PVOID Function = KGetProcAddressByHash( Instance, ImportModule, 0, IMAGE_ORDINAL( OriginalTD->u1.Ordinal ) );
                 if ( Function != NULL )
                     FirstTD->u1.Function = Function;
             }
