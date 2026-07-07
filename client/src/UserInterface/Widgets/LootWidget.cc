@@ -297,7 +297,6 @@ void LootWidget::Reload()
     for ( auto& Session : HavocX::Teamserver.Sessions )
         ComboAgentID->addItem( Session.Name );
 
-    // TODO: iterate over table items and free memory
     ScreenshotTable->setRowCount( 0 );
     DownloadTable->setRowCount( 0 );
 }
@@ -335,9 +334,8 @@ void LootWidget::onAgentChange( const QString& text )
 {
     ScreenshotImage->setPixmap( QPixmap() );
 
-    // todo: free columns items
-    for ( int i = ScreenshotTable->rowCount(); i >= 0; i-- )
-        ScreenshotTable->removeRow( i );
+    ScreenshotTable->setRowCount( 0 );
+    DownloadTable->setRowCount( 0 );
 
     for ( auto& item : LootItems )
     {
