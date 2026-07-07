@@ -753,15 +753,12 @@ func (t *Teamserver) SendEvent(id string, pk packager.Package) error {
 	if isOk {
 		client := value.(*Client)
 		client.Mutex.Lock()
+		defer client.Mutex.Unlock()
 
 		err = client.Connection.WriteMessage(websocket.BinaryMessage, buffer.Bytes())
 		if err != nil {
-			// TODO: comment this line out as it seems to crash the server
-			//t.Clients[id].Mutex.Unlock()
 			return err
 		}
-
-		client.Mutex.Unlock()
 
 	} else {
 		return errors.New(fmt.Sprintf("client (%v) doesn't exist anymore", colors.Red(id)))
